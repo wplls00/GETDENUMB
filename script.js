@@ -27,11 +27,12 @@ function clearCanvas() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-// Загружаем модель
+// Загружаем модель как Graph Model
 let model;
 (async function loadModel() {
   try {
-    model = await tf.loadLayersModel('./web_model/model.json');
+    const modelUrl = './web_model/model.json'; // Убедитесь, что путь правильный
+    model = await tf.loadGraphModel(modelUrl);
     console.log('Модель успешно загружена!');
     statusSpan.textContent = 'Модель загружена! Можно рисовать.';
   } catch (error) {
@@ -46,9 +47,8 @@ function preprocessCanvas(canvas) {
   const tensor = tf.browser.fromPixels(imageData)
     .resizeNearestNeighbor([28, 28]) // Уменьшаем до 28x28 пикселей
     .mean(2) // Преобразуем в градации серого
-    .expandDims(2)
-    .expandDims()
-    .toFloat();
+    .toFloat()
+    .expandDims(0); // Добавляем размерность batch (форма [1, 28, 28])
   return tensor.div(255.0); // Нормализуем значения пикселей
 }
 
